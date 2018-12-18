@@ -1,0 +1,65 @@
+﻿@using SLADashboard.Infrastructure;
+@model TableReport
+@using (Html.BeginForm(null, null, FormMethod.Post, new { id = "__AjaxAntiForgeryForm" }))
+{
+	@Html.AntiForgeryToken();
+}
+@if (Model.ReportInfo != null)
+{
+	@Html.HiddenFor(m => m.ReportName);
+	@Html.HiddenFor(m => m.Period);
+
+	if (Model.ReportInfo.Count() == 0)
+	{
+		<img id="imgNoData" style="margin-left:50px; margin-top:50px;" src="~/Content/Images/No-Data.png" />
+	}
+	else
+	{
+		<div class="col-md-1" style="width:90%">
+
+			<div class="display col-md-2" style="width:90%">
+				<b id="periodDisp">@Model.Period</b>
+				<button class="btn btn-primary" onclick="ExportToExcel(this)"><i class="glyphicon glyphicon-download-alt"></i> &nbsp; Download Excel</button>
+			</div>
+
+			<table id="tableReport" class="table table-striped table-condensed" style="width:80%">
+				<thead>
+					<tr class="d-flex">
+						<th style="width:30%">Profile</th>
+						<th style="width:30%">SLA</th>
+						<th style="width:20%">Target SLA(%)</th>
+						<th style="width:20%">Actual SLA(%)</th>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var profileGroup in Model.ReportInfo.GroupBy(_ => _.ProfileDescription))
+					{
+						<tr class="display">
+							<td style="display:none"></td>
+							<td colspan="4" class="boldtext">@profileGroup.Key</td>
+
+						</tr>
+						foreach (var reportInfo in profileGroup)
+						{
+							<tr class="display">
+								<td class="textSla">@reportInfo.Profile</td>
+								<td class="textSla">@reportInfo.SlaName</td>
+								<td class="textSla">@reportInfo.Target</td>
+								<td class="textSla">@reportInfo.TargetAchieved</td>
+								<td style="display:none">@reportInfo.ProfileID</td>
+								<td style="display:none">@reportInfo.ProfileDescription</td>
+								<td style="display:none">@reportInfo.ProfilePrefix</td>
+								<td style="display:none">@reportInfo.ClientName</td>
+								<td style="display:none">@reportInfo.SLAIndicator</td>
+								<td style="display:none">@reportInfo.SlaDescription</td>
+							</tr>
+						}
+
+					}
+
+				</tbody>
+			</table>
+		</div>
+
+	}
+}

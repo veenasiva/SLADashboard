@@ -1,0 +1,51 @@
+﻿@using SLADashboard.Models
+
+@model AccessDeniedViewModel
+
+
+<h1>@Model.UserId, your session has expired.</h1>
+<h1 style="margin-top:20px;">You will be redirected to the home page in <span id="secondsId">5 Seconds.</span></h1>
+
+<script>
+        var delay = 5000;
+       
+        $(document).ready(function () {       
+            setInterval(processSessionTimeout, delay);
+
+            var countDownDate = new Date();
+            countDownDate.setSeconds(countDownDate.getSeconds() + 6);
+
+
+            // Update the count down every 1 second
+            var x = setInterval(function () {
+
+                // Get todays date and time
+                var now = new Date().getTime();
+
+                // Find the distance between now and the count down date
+                var distance = countDownDate - now;
+
+                // Time calculations for seconds
+                var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                // Display the result in the element with id="secondsId"
+                if (seconds == 1) {
+                    document.getElementById("secondsId").innerHTML = seconds.toString() + " second.";
+                }
+                else {
+                    document.getElementById("secondsId").innerHTML = seconds.toString() + " seconds.";
+                }
+
+                if (distance < 0) {
+                    clearInterval(x);
+                    document.getElementById("secondsId").innerHTML = "0 seconds.";
+                }
+            }, 1000);
+        });
+
+        function processSessionTimeout() {
+            window.location.href = '@Url.Action("SelectConfiguredProfile", "Operator")';
+    }    
+
+  
+</script>

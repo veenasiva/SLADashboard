@@ -1,0 +1,216 @@
+﻿@using SLADashboard.Core;
+@model  List<Client>
+@{
+	ViewBag.Title = "SelectConfiguredProfile";
+}
+
+<div class="row container">
+
+	<div role="search" class="row" id="searchClients">
+		<div class="col-md-1 col-lg-offset-3">
+			<img src="~/Content/Images/Client.png" class="client-image" />
+		</div>
+		<div class="col-md-8">
+			<div class="type-ahead-wrapper type-ahead-input-wrapper">
+				<div class="type-ahead-input">
+					<span class="typeahead-icon svg-icon-wrap">
+						<li-icon aria-hidden="true" type="search-icon" size="medium">
+							<svg viewBox="0 0 24 24" width="24px" height="24px" x="0" y="0" preserveAspectRatio="xMinYMin meet" class="artdeco-icon" focusable="false">
+								<path d="M21,19.67l-5.44-5.44a7,7,0,1,0-1.33,1.33L19.67,21ZM10,15.13A5.13,5.13,0,1,1,15.13,10,5.13,5.13,0,0,1,10,15.13Z" class="large-icon" style="fill: currentColor"></path>
+							</svg>
+						</li-icon>
+					</span>
+					<div class="autocomplete">
+						<input id="myInput" type="text" name="clientList" placeholder="Client..." class="form-control" actionurl="@Url.Action("FilterClientSearchList","Operator")">
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<div class="row" style="margin-top:40px;">
+		<div class="col-md-5 col-lg-offset-3">
+			<div class="panel-group">
+				<div id="partial_FilterClientSearch">
+					@{Html.RenderPartial("_ClientSearchView", Model);}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+@using (Html.BeginForm(null, null, FormMethod.Post, new { id = "__AjaxAntiForgeryForm" }))
+{
+	@Html.AntiForgeryToken();
+}
+@*@Html.Hidden("mode", (Mode)Session["mode"])*@
+
+@Scripts.Render("~/bundles/jquery")
+@Scripts.Render("~/bundles/knockout")
+
+<script>
+
+    document.addEventListener('keydown', function (event) {
+        if (event.keyCode == 17 || event.keyCode == 74) { //Prevent the download window from opening
+            event.preventDefault();
+        }
+    });
+
+    $(document).ready(function () {
+        $("#configScan").addClass("sidebar-active").siblings().removeClass("sidebar-active");
+        $("#configSettings").addClass("sidebar-inactive");
+        $("#configReports").addClass("sidebar-inactive");
+
+
+        var mode = $('#mode').val(); //Only filter clients if in Operator Mode
+
+        $('.collapse').on('shown.bs.collapse', function () {
+            $(this).parent().find(".glyphicon-triangle-right").removeClass("glyphicon-triangle-right").addClass("glyphicon-triangle-bottom");
+         });
+
+        $('.collapse').on('hidden.bs.collapse', function () {
+            $(this).parent().find(".glyphicon-triangle-bottom").removeClass("glyphicon-triangle-bottom").addClass("glyphicon-triangle-right");
+         });
+         var clients = @Html.Raw(Json.Encode(Model.Select(_ => _.Description)));
+
+         autocomplete(document.getElementById("myInput"), clients);
+
+    });
+
+	function FilterClientSearchList(filter, mode) {
+		var url = $("#myInput").attr('actionurl');
+		var token = $("#__AjaxAntiForgeryForm input").val();
+		var dataObject = {
+			__RequestVerificationToken: token
+		};
+           $.ajax({
+			   url: url,
+               type: 'POST',
+			   data: { filter: filter, mode: mode },
+			   headers: dataObject,
+               success: function (data) {
+                   $('#partial_FilterClientSearch').html(data);
+               },
+               failure: function (response) {
+                   alert(response);
+               },
+               error: function (request, status, error) {
+                   alert(status + ' ' + error + ' ' + request.responseText);
+               }
+           });
+    }
+
+    function autocomplete(inp, arr) {
+        /*the autocomplete function takes two arguments,
+        the text field element and an array of possible autocompleted values:*/
+        var currentFocus;
+        var mode = $('#mode').val();
+        /*execute a function when someone writes in the text field:*/
+        inp.addEventListener("input", function (e) {
+            var a, b, i, TypedInValue = this.value;
+            /*close any already open lists of autocompleted values*/
+            closeAllLists();
+            if (!TypedInValue) {
+                FilterClientSearchList(TypedInValue, mode);
+                return false;
+            }
+            currentFocus = -1;
+            /*create a DIV element that will contain the items (values):*/
+            a = document.createElement("DIV");
+            a.setAttribute("id", this.id + "autocomplete-list");
+            a.setAttribute("class", "autocomplete-items");
+            /*append the DIV element as a child of the autocomplete container:*/
+            this.parentNode.appendChild(a);
+            /*for each item in the array...*/
+            for (i = 0; i < arr.length; i++) {
+                /*check if the item starts with the same letters as the text field value:*/
+                if (arr[i].substr(0, TypedInValue.length).toUpperCase() == TypedInValue.toUpperCase()) {
+                    /*create a DIV element for each matching element:*/
+                    b = document.createElement("DIV");
+                    /*make the matching letters bold:*/
+                    b.innerHTML = "<strong>" + arr[i].substr(0, TypedInValue.length) + "</strong>";
+                    b.innerHTML += arr[i].substr(TypedInValue.length);
+                    /*insert a input field that will hold the current array item's value:*/
+                    b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+                    /*execute a function when someone clicks on the item value (DIV element):*/
+                    b.addEventListener("click", function (e) {
+                        /*insert the value for the autocomplete text field:*/
+                        inp.value = this.getElementsByTagName("input")[0].value;
+                        /*close the list of autocompleted values,
+                        (or any other open lists of autocompleted values:*/
+                        closeAllLists();
+                    });
+                    a.appendChild(b);
+                }
+            }
+
+            FilterClientSearchList(TypedInValue, mode);
+
+        });
+
+        /*execute a function presses a key on the keyboard:*/
+        inp.addEventListener("keydown", function (e) {
+            var x = document.getElementById(this.id + "autocomplete-list");
+            if (x) x = x.getElementsByTagName("div");
+            if (e.keyCode == 40) {
+                /*If the arrow DOWN key is pressed,
+                increase the currentFocus variable:*/
+                currentFocus++;
+                /*and and make the current item more visible:*/
+                addActive(x);
+            } else if (e.keyCode == 38) { //up
+                /*If the arrow UP key is pressed,
+                decrease the currentFocus variable:*/
+                currentFocus--;
+                /*and and make the current item more visible:*/
+                addActive(x);
+            } else if (e.keyCode == 13) {
+                /*If the ENTER key is pressed, prevent the form from being submitted,*/
+                e.preventDefault();
+                if (currentFocus > -1) {
+                    /*and simulate a click on the "active" item:*/
+                    if (x) x[currentFocus].click();
+                }
+            }
+        });
+
+
+
+        function addActive(x) {
+            /*a function to classify an item as "active":*/
+            if (!x) return false;
+            /*start by removing the "active" class on all items:*/
+            removeActive(x);
+            if (currentFocus >= x.length) currentFocus = 0;
+            if (currentFocus < 0) currentFocus = (x.length - 1);
+            /*add class "autocomplete-active":*/
+            x[currentFocus].classList.add("autocomplete-active");
+        }
+
+        function removeActive(x) {
+            /*a function to remove the "active" class from all autocomplete items:*/
+            for (var i = 0; i < x.length; i++) {
+                x[i].classList.remove("autocomplete-active");
+            }
+        }
+
+        function closeAllLists(elmnt) {
+            /*close all autocomplete lists in the document,
+            except the one passed as an argument:*/
+            var x = document.getElementsByClassName("autocomplete-items");
+            for (var i = 0; i < x.length; i++) {
+                if (elmnt != x[i] && elmnt != inp) {
+                    x[i].parentNode.removeChild(x[i]);
+                }
+            }
+        }
+        /*execute a function when someone clicks in the document:*/
+        document.addEventListener("click", function (e) {
+            closeAllLists(e.target);
+        });
+
+
+    }
+</script>
+
+

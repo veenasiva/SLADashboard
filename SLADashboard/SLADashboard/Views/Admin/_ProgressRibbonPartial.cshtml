@@ -1,0 +1,108 @@
+﻿@Styles.Render("~/Content/css")
+@Styles.Render("~/Styles/SLA.css")
+
+
+@{
+	string[] pages = { "ConfigureClient", "ConfigureProfile", "ConfigureSLA", "checkProgressSteps" };
+
+	if (pages.Contains(@HttpContext.Current.Request.RequestContext.RouteData.Values["Action"]))
+	{
+		var currentPage = "";
+		if (HttpContext.Current.Request.RequestContext.RouteData.Values["Action"].ToString().StartsWith("ConfigureClient"))
+		{
+			currentPage = "Client";
+		}
+		else if (HttpContext.Current.Request.RequestContext.RouteData.Values["Action"].ToString().StartsWith("ConfigureProfile"))
+		{
+			currentPage = "Profile";
+		}
+		else
+		{
+			currentPage = "SLA";
+		}
+
+		<div class="row">
+			<div class="col-md-9">
+				<div class="btn-toolbar" data-toggle="buttons">
+					@{
+						switch (currentPage)
+						{
+							case "Client":
+								<label id="lblClients" class="btn btn-success btn-xl" disabled>
+									<input type="radio" name="BarCodeType" id="clientsBtn">Clients
+								</label>
+								break;
+							case "Profile":
+								<label id="lblClients" class="btn btn-success btn-xl" onclick="ClientsClick()">
+									<input type="radio" name="BarCodeType" id="clientsBtn">Clients
+								</label>
+								<label id="lblProfile" class="btn btn-primary btn-xl" disabled>
+									<input type="radio" name="BarCodeType" id="profileBtn" disabled>Profile
+								</label>
+								break;
+							case "SLA":
+								<label id="lblClients" class="btn btn-success btn-xl" onclick="ClientsClick()">
+									<input type="radio" name="BarCodeType" id="clientsBtn">Clients
+								</label>
+								<label id="lblProfile" class="btn btn-primary btn-xl" onclick="ProfilesClick()">
+									<input type="radio" name="BarCodeType" id="profileBtn">Profile
+								</label>
+								<label id="lblBarCode" class="btn btn-warning btn-xl" disabled>
+									<input type="radio" name="BarCodeType" id="barCodeBtn" disabled>SLA
+								</label>
+								break;
+						}
+					}
+
+				</div>
+			</div>
+		</div>
+	}
+}
+
+<script>
+
+    function EnableClient() {
+                            document.getElementById("lblClients").disabled = false;
+    }
+
+    function ClientsClick() {
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("ConfigureClient", "Admin")',
+            data: null,
+            success: function (response) {
+                window.location.href = '@Url.Action("ConfigureClient", "Admin",null)';
+            },
+            failure: function (response) {
+                alert(response);
+            },
+            error: function (request, status, error) {
+                alert(status + ' ' + error + ' ' + request.responseText);
+            }
+        });
+    }
+
+    function ProfilesClick() {
+             var id = $("#Client_ID").val();
+
+             $.ajax({
+                type: "POST",
+                url: '@Url.Action("ConfigureProfile", "Admin")',
+                data: { clientId: id },
+                success: function (response) {
+                    window.location.href = '@Url.Action("ConfigureProfile", "Admin",new { clientId = "SC"})'.replace("SC", $('#Client_ID').val());
+                },
+                failure: function (response) {
+                    alert(response);
+                },
+                error: function (request, status, error) {
+                    alert(status + ' ' + error + ' ' + request.responseText);
+                }
+            });
+    }
+
+    $(document).ready(function () {
+    });
+
+</script>

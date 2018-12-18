@@ -1,0 +1,66 @@
+﻿@using SLADashboard.Models;
+@model SLADefinitionListViewModel
+
+<div class="border-content" style="width:95%">
+	@using (Html.BeginForm(null, null, FormMethod.Post, new { id = "__AjaxAntiForgeryForm" }))
+	{
+		@Html.AntiForgeryToken();
+	}
+	<div class="container" style="width:100%">
+		<div class="inssave-btn">
+			<input type="button" id="btnAdd" value="Add New SLA" class="buttonCreate btn btn-custom btn-lg" request-url="@Url.Action("AddSLA", "Admin")" />
+		</div><br />
+		<div class="row" style="margin-bottom:40px;">
+			<div class="col-md-6" style="width:99%">
+				<div class="row form-spacing" style="width:100%">
+					@if (Model.SLAList != null)
+					{
+						<div id="userGrid" class="row" style="width:100%">
+							<table class="table table-bordered table-striped">
+								<tr class="label_SLA">
+									<th>Name</th>
+									<th>Description</th>
+									<th>Target</th>
+									<th></th>
+								</tr>
+								@foreach (var item in Model.SLAList)
+								{
+									<tr class="display">
+										<td class="hidden">@item.ID</td>
+										<td class="Name"><label id="lblName" class="textSla">@item.Name</label></td>
+										<td class="Description"><label id="lblDescription" class="textSla" >@item.Description</label></td>
+										<td><label id="lblTarget" class="textSla">@item.Target</label></td>
+										<td>
+											<a href='#' class="buttonEdit display"><span class="glyphicon btn-glyphicon glyphicon-pencil text-info" id="btnEdit" request-url="@Url.Action("EditSLAPartialView", "Admin")"></span></a>
+											<a href="#" class="buttonDelete display"><span class="glyphicon btn-glyphicon glyphicon-trash text-danger"></span></a>
+										</td>
+
+									</tr>
+								}
+							</table>
+						</div>
+					}
+				</div>
+			</div>
+		</div>
+		<div id="SelectedClient" class="hidden"></div>
+		<div id="SelectedProfile" class="hidden"></div>
+		<div id="createForm"></div>
+		<div id="editForm"></div>
+		<div id="deleteForm">
+			<p>Please provide the confirmation to delete SLA Item<div id="SLAIDToDelete" class="boldtext"></div></p>
+			<input type="button" value="Yes" class="okDelete btn btn-success btn-sm" id="btnDelete" request-url="@Url.Action("DeleteSLA", "Admin")" partialview-url="@Url.Action("SLADefinition", "Admin")" />
+		</div>
+		<script src="~/Scripts/SLA/SLAScript.js"></script>
+	</div>
+</div>
+
+	<script>
+	$(document).ready(function () {
+		let clientId = @Html.Raw(Json.Encode(Model.ClientID));
+		let profileId = @Html.Raw(Json.Encode(Model.ProfileID));
+		$('#SelectedClient').val(clientId);
+		$('#SelectedProfile').val(profileId);
+	});
+	</script>
+

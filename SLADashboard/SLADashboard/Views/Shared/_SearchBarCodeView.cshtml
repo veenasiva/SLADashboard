@@ -1,0 +1,80 @@
+﻿@using SLADashboard.Models
+@using SLADashboard.Infrastructure
+@model List<ConfigureBarCodeSearchViewModel>
+
+<style>
+    #tableReport tr {
+        transition: background 0.2s ease-in;
+    }
+
+        #tableReport tr:hover {
+            background: #f9f9f9;
+        }
+
+    #tableReport th {
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    #tableReport td, #tableReport th {
+        padding: 12px 10px;
+        font-size: 14px;
+        white-space: nowrap;
+        vertical-align: middle;
+    }
+
+    #tableReport tfoot td, #tableReport th {
+        background-color: RGB(238, 238,238)
+    }
+
+    .table-striped > tbody > tr:nth-child(2n+1) > td, .table-striped > tbody > tr:nth-child(2n+1) > th {
+        background-color: #f9f9f9
+    }
+
+    .table > tbody > tr > td, .table > tbody > tr > th, .table > tfoot > tr > td, .table > tfoot > tr > th, .table > thead > tr > td, .table > thead > tr > th, table > tbody > tr > td, table > tbody > tr > th, table > tfoot > tr > td, table > tfoot > tr > th, table > thead > tr > td, table > thead > tr > th {
+        border-color: transparent
+    }
+
+    .numerical-col {
+        text-align: right;
+    }
+</style>
+
+@if (Model.Count() == 0)
+{
+    <h1>Barcode has not been entered into the system</h1>
+}
+else
+{
+    <div class="row">
+        <table id="tableReport" class="col-md-offset-1 table table-striped" style="width:50%">
+            <thead>
+                <tr class="d-flex">
+                    <th style="width:45%">Barcode</th>
+                    <th style="width:35%">Client Name</th>
+                    <th style="width:35%">Profile Name</th>
+                    <th style="width:35%">Time Stamp</th>
+                    <th style="width:35%">Added User</th>
+                    <th style="width:35%">Has Been Deleted</th>
+                    <th style="width:35%">Deleted User</th>
+                </tr>
+            </thead>
+            <tbody>      
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.BarCodeNumber</td>
+                        <td>@item.ClientName</td>
+                        <td>@item.ProfileName</td>
+                        <td>@item.TimeStamp</td>
+                        <td>@item.AddedUser</td>
+                        <td style="text-align:center;">@item.IsDeleted</td>
+                        <td>@item.DeletedUser</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+

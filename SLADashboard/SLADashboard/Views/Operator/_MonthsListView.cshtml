@@ -1,0 +1,12 @@
+﻿@using SLADashboard.Core
+@model List<Month>
+
+<select class="form-control" id="MonthSelect" name="MonthSelect" onchange="MonthChange(this)" onload="MonthChange(this)">
+	
+	@foreach (var month in Model)
+	{
+		<option id="@month.key">@month.value</option>
+	}
+</select>
+
+

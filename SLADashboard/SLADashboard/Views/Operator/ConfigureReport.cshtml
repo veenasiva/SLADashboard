@@ -1,0 +1,209 @@
+﻿@using SLADashboard.Models
+@using SLADashboard.Infrastructure
+@model ConfigureReportViewModel
+@{
+	ViewBag.Title = "SLA Report";
+}
+
+<script src="~/Scripts/jquery-3.3.1.min.js"></script>
+<script src="~/Scripts/moment.js"></script>
+
+<div class="row" style="margin-top:10px;">
+	<h4 class="col-md-1" style="margin-top:1px;">Client</h4>
+	<div class="col-md-2 no-padding">
+		<select class="form-control" id="ClientSelect" name="ClientSelect" onchange="ClientChange(this)">
+			@foreach (var client in Model.Clients)
+			{
+				<option id="@client.ID">@client.Description</option>
+			}
+		</select>
+	</div>
+	<h4 class="col-md-1" style="margin-top:1px;">Year</h4>
+	<div class="col-md-2 no-padding">
+		<select class="form-control" id="YearSelect" name="YearSelect" onchange="YearChange(this)">
+			@foreach (var year in Model.Years)
+			{
+				<option id="@year.key" value="@year.key" @(year.key == Model.SelectedYear ? "selected='selected'" : "")>@year.value</option>
+			}
+		</select>
+	</div>
+	<h4 class="col-md-1" style="margin-top:1px;">Month</h4>
+	<div class="col-md-2 no-padding">
+		<div id="partial_Month">
+			<select class="form-control" id="MonthSelect" name="MonthSelect" onchange="MonthChange(this)">
+
+				@foreach (var month in Model.Months)
+				{
+					<option id="@month.key" @(month.key == Model.SelectedMonth ? "selected='selected'" : "")>@month.value</option>
+				}
+			</select>
+		</div>
+	</div>
+
+</div>
+
+<div class="row" style="margin-top:35px">
+
+	<div>
+
+
+		<div id="partial_TableReport">
+			@{Html.RenderPartial("_TableReportView", new TableReport()); }
+		</div>
+	</div>
+</div>
+
+<div id="SelectedClient">
+</div>
+<div id="SelectedProfile">
+</div>
+<div id="SelectedReport">
+</div>
+
+<script>
+
+    function ExportToExcel(e) {
+		var token = $("#__AjaxAntiForgeryForm input").val();
+		var dataObject = {
+			__RequestVerificationToken: token
+		};
+        var reportInfo = [];
+        for (var row = 1; row < $("#tableReport")[0].rows.length; row++) {
+            let rowData = $("#tableReport")[0].rows[row];
+
+            if (rowData.cells[0].innerHTML.length > 0) {
+                reportInfo.push({
+                    Profile: rowData.cells[0].innerHTML,
+                    SlaName: rowData.cells[1].innerHTML,
+					SlaDescription: rowData.cells[9].innerHTML,
+					Target: rowData.cells[2].innerHTML,
+					TargetAchieved: rowData.cells[3].innerHTML,
+					ProfileID: rowData.cells[4].innerHTML,
+					ProfileDescription: rowData.cells[5].innerHTML,
+					ProfilePrefix: rowData.cells[6].innerHTML,
+					ClientName: rowData.cells[7].innerHTML,
+					SLAIndicator: rowData.cells[8].innerHTML
+                });
+            }
+        }
+
+        var data = {
+            ReportName: $('#ReportName').val(),
+            Period: $('#Period').val(),
+            ReportInfo: reportInfo
+        };
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("ExportReport", "Operator")' ,
+			data: { reportData: ko.toJSON(data) },
+			headers: dataObject,
+            success: function (response) {
+
+                if (response.Success) {
+                    alert(response.SuccessMessage);
+                }
+                else {
+                    alert(response.ErrorMessage);
+                }
+            }
+        });
+    }
+
+    function DisplayReport() {
+
+		let profileId = 0;//Report view shows all profiles for selected client
+		let clientId = document.getElementById("ClientSelect")[document.getElementById("ClientSelect").selectedIndex].id;
+		var year = document.getElementById("YearSelect")[document.getElementById("YearSelect").selectedIndex].id;
+		var month = document.getElementById("MonthSelect")[document.getElementById("MonthSelect").selectedIndex].id;
+		$('#SelectedYear').val(year);
+		$('#SelectedMonth').val(month);
+		var token = $("#__AjaxAntiForgeryForm input").val();
+		var dataObject = {
+			__RequestVerificationToken: token
+		};
+		var data = {
+			ProfileID: profileId,
+			ClientID: clientId,
+			SelectedYear: year,
+			SelectedMonth: month
+		}
+
+        $.ajax({
+            url: '@Url.Action("TableReport", "Operator")' ,
+            type: 'POST',
+			data: { reportData: ko.toJSON(data) },
+			headers: dataObject,
+            success: function (data) {
+                $('#partial_TableReport').html(data);
+            },
+            failure: function (response) {
+                alert(response);
+            },
+            error: function (request, status, error) {
+                alert(status + ' ' + error + ' ' + request.responseText);
+            }
+        });
+    }
+
+    function ClientChange(client) {
+        var clientID = client[client.selectedIndex].id;
+        $('#SelectedClient').val(clientID);
+        DisplayReport();
+
+    };
+
+
+    $(document).ready(function () {
+        $("#configReports").addClass("sidebar-active").siblings().removeClass("sidebar-active");
+        $("#configScan").addClass("sidebar-inactive");
+        $("#configSettings").addClass("sidebar-inactive");
+
+
+        DisplayReport();
+	});
+	function YearChange(year) {
+		var year = year[year.selectedIndex].id;
+		LoadMonthsForYear(year);
+		DisplayReport();
+
+	};
+	function LoadMonthsForYear(year) {
+		var token = $("#__AjaxAntiForgeryForm input").val();
+		var dataObject = {
+			__RequestVerificationToken: token
+		};
+		$.ajax({
+			url: '@Url.Action("LoadMonthsForYear", "Operator")' ,
+			type: 'POST',
+			data: { year: year },
+			headers: dataObject,
+			success: function (data) {
+				$('#partial_Month').html(data);
+				//$('#SelectedProfile').val(0); //Default to All Profiles
+			},
+			failure: function (response) {
+				alert(response);
+			},
+			error: function (request, status, error) {
+				alert(status + ' ' + error + ' ' + request.responseText);
+			}
+		});
+		selectMonth = document.getElementById("MonthSelect");
+		var month = @Model.SelectedMonth;
+		var att = document.createAttribute("selected");
+		att.value = "selected";
+
+		for (var j = 0; j < selectMonth.length; j++) {
+
+			if (selectMonth[j].id == month) {
+				return selectMonth[j].setAttributeNode(att);
+			}
+		};
+	}
+
+	function MonthChange(month) {
+		DisplayReport();
+
+	};
+</script>

@@ -1,0 +1,122 @@
+﻿@using SLADashboard.Models;
+@model AddClientViewModel
+
+@{
+	ViewBag.Title = "Client";
+}
+
+<div class="row" style="margin-top:15px;">
+	<div class="col-md-5">
+		<h2>Available Clients</h2>
+	</div>
+	<div class="row" style="margin-top:30px;">
+		<div class="col-md-12">
+			<ul id="AvailableClients" class="available-clients">
+				@{Html.RenderPartial("_AvailableClientView", Model.Clients);}
+			</ul>
+		</div>
+	</div>
+</div>
+
+@using (Html.BeginForm("AddClient", "Admin", FormMethod.Post, new { id = "AddClientForm", @class = "form-horizontal", role = "form", data_bind = "submit: submitAddClient" }))
+{
+
+	<div class="border-content" style="width:50%">
+		<div class="row" style="margin-left:4px; margin-bottom:10px;">
+			<p>Don't see the client on the list? Add a new one...</p>
+			<label class="col-md-3" style="margin-top:7px;">Client Name</label>
+			<div class="col-md-6">
+				@Html.TextBoxFor(m => m.NewClientName, new { id = "clientNameTextBox", placeholder = "Client Name...", @class = "form-control", data_bind = "value: NewClientName" })
+				@Html.ValidationMessageFor(m => m.NewClientName, "", new { @class = "text-danger" })
+			</div>
+
+			<div class="col-md-3">
+				<a class="btn icon-btn btn-success" href="#" type="submit" onclick="submitAddClientForm()" id="btnAddClient" actionurl="@Url.Action("AddClient","Admin")">
+					<span class="glyphicon btn-glyphicon glyphicon-plus img-circle text-success"></span>
+					Add Client
+				</a>
+			</div>
+		</div>
+	</div>
+}
+
+<div id="SelectedClientId">
+</div>
+@Styles.Render("~/Styles/SLA.css")
+@Scripts.Render("~/bundles/jquery")
+@Scripts.Render("~/Scripts/Clients/AddClient.js")
+@Scripts.Render("~/bundles/knockout")
+
+<script>
+
+    $(document).ready(function () {
+        $("#configSettings").addClass("sidebar-active").siblings().removeClass("sidebar-active");
+        $("#configScan").addClass("sidebar-inactive");
+        $("#configReports").addClass("sidebar-inactive");
+ 
+    });
+
+	function submitAddClientForm() {
+		
+        $('#AddClientForm').submit();
+    }
+
+    function HandleSelectFromListClientClick(e) {
+
+        $("#SelectedClientId").val(e.getAttribute('data-id'));
+
+        $.ajax({
+			type: "POST",
+			//Below will allow to use relative URL so that the link is not broken when hosted as site/subsite
+			url: $("#btnClient").attr('actionurl'),
+            data: { clientId: e.getAttribute('data-id') },
+            success: function (response) {
+                window.location.href = '@Url.Action("ConfigureProfile", "Admin",new { clientId = "SC"})'.replace("SC", $('#SelectedClientId').val());
+            },
+            failure: function (response) {
+                alert(response);
+            },
+            error: function (request, status, error) {
+                alert(status + ' ' + error + ' ' + request.responseText);
+            }
+        });
+    }
+
+	function ClientMouseOver(e) {
+		ClientMouseOverJS(e);
+            }
+
+	function ClientMouseOut(e) {
+		ClientMouseOutJS(e);
+           }
+
+    function AddClientToSelectFromList(clientsObj) {
+
+        dynamicHtml = '<li id="Client-' + clientsObj.ID + '" class="add-clients">'
+            + '<artdeco-toggle-pill checked="" type="toggle" class="ember-view">'
+            + '<button type="button" data-id="' + clientsObj.ID + '" name="' + clientsObj.Name + '" aria-pressed="true" data-ember-action="" onclick="HandleSelectFromListClientClick(this)" onmouseover="ClientMouseOver(this)" onmouseout="ClientMouseOut(this)" data-ember-action-11105="11105">'
+            + '<span class="artdeco-pill-icons">'
+            + '<li-icon aria-hidden="true" type="plus-icon" size="small"><svg viewBox="0 0 24 24" width="24px" height="24px" x="0" y="0" preserveAspectRatio="xMinYMin meet" class="artdeco-icon" focusable="false"><path d="M14,9H9v5H7V9H2V7H7V2H9V7h5V9Z" class="small-icon" style="fill-opacity: 1"></path></svg></li-icon>'
+            + '</span>'
+            + '<span class="artdeco-pill-label-text">'
+            + clientsObj.Name
+            + '</span>'
+            + '</button>'
+            + '</artdeco-toggle-pill></li>'
+        $("#AvailableClients").append(dynamicHtml);
+
+        $('[data-id=' + clientsObj.ID + ']').click(function () {
+            HandleSelectFromListClientClick(this);
+        });
+
+        $('[data-id=' + clientsObj.ID + ']').mouseover(function () {
+            ClientMouseOver(this);
+        });
+
+        $('[data-id=' + clientsObj.ID + ']').mouseout(function () {
+            ClientMouseOut(this);
+        });
+
+    }
+
+</script>

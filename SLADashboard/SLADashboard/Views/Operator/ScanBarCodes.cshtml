@@ -1,0 +1,198 @@
+﻿@using SLADashboard.Models;
+@using SLADashboard.Core;
+
+@model ScanBarCodeViewModel
+@{
+    ViewBag.Title = "ScanBarCodes";
+}
+
+<style>
+
+    .form-control:focus {
+        border-color: #0000FF;
+        box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(0, 0, 255, 0.6);
+    }
+
+    #barcodeTextBox {
+        margin-left: 20px;
+        margin-top: 15px;
+        font-size: 2em;
+        min-width: 350px;
+    }
+
+    .scanned-barcode-count {
+        min-width: 300px;
+    }
+</style>
+
+<audio id="myAudio">
+    <source src="~/Content/Sounds/scanner-beep.mp3" type="audio/mpeg">
+</audio>
+
+<div class="modal" id="duplicateBarCodeModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color:red;color:white;">
+                <h3 class="modal-title">Duplicate Barcode Detected</h3>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" style="background-color:red;color:white;">
+                <h4 id="modal-body-text"></h4>
+            </div>
+            <div class="modal-footer" style="background-color:red;color:white;">
+                <button id="btnIgnore" type="button" class="btn btn-success" data-dismiss="modal">Ignore</button>
+                <button id="btnDelete" type="button" class="btn btn-info" data-dismiss="modal">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-md-6 col-md-offset-1">
+
+        @if ((Mode)Session["mode"] == Mode.Administrator)
+        {
+            <div class="border-content" style="position:relative ;width:100%; background-color:rgba(255, 0, 0, 0.7); color:white; border-radius:35px;">
+                <div style="position:absolute;top:8px; left:35px;">* Data entered in Admin Mode will not be saved</div>
+                <h1 style="text-align:center">@Model.ClientName </h1>
+                <h1 style="text-align:center">@Model.ProfileName</h1>
+            </div>
+        }
+        else
+        {
+            <div class="border-content" style="width:100%; background-color:rgba(0, 0, 0, 0.25); color:white; border-radius:35px;">
+                <h1 style="text-align:center">@Model.ClientName </h1>
+                <h1 style="text-align:center">@Model.ProfileName</h1>
+            </div>
+        }
+
+        @using (Html.BeginForm("SubmitBarCode", "Operator", FormMethod.Post, new { id = "ScanBarCodesForm", @class = "form-horizontal", role = "form", data_bind = "submit: submitBarCode" }))
+        {
+
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            <div class="form-group" style="margin-top:30px;">
+                <span class="col-md-2" style="margin-top:10px; font-size: 30px;">BarCode</span>
+                <div class="col-md-10">
+                    @Html.TextBoxFor(m => m.BarCodeNumber, new { id = "barcodeTextBox", placeholder = "", @class = "form-control", data_bind = "textInput : barCodeNumber", @onchange = "resetBarcodeError(this);" })
+                    @Html.ValidationMessageFor(m => m.BarCodeNumber, "", new { @class = "text-danger", @style = "margin-top:10px;" })
+                </div>
+            </div>
+            if (Model.ShowSenderDetails)
+            {
+                <div id="senderDetailsSect" style="margin-top:30px;">
+                    <span class="col-md-5" style="padding-left:0px; margin-top:10px; font-size: 30px;">Sender Details</span>
+                    <div><textarea id="senderDetails" rows="5" style="font-size:xx-large;min-width:600px;" required></textarea></div>
+                    <div style="margin-top:30px;">
+                        <button class="btn btn-primary btn-md" type="submit" style="display:block">Save</button>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <button class="btn btn-primary btn-md" type="submit" style="display:none">Save</button>
+            }
+
+            @Html.HiddenFor(m => m.ProfileID);
+            @Html.HiddenFor(m => m.ProfileName);
+        }
+    </div>
+
+    <div class="border-content">
+        <div class="col-md-5" style="margin-top:25px">
+
+            <div class="row scanned-barcode-count">
+                <img alt="" src="~/Content/Images/Dec-Scanner.jpg" style="width: 100px; height: 100px;" />
+                <span style="font-size:30px;">Scanned: <b><span id="SessionBarCodeScanCount"></span></b></span>
+            </div>
+            <div class="row scanned-barcode-count">
+                <div class="col-md-6 col-md-offset-3" style="margin-top:15px">
+                    <button type="button" class="btn btn-info btn-lg" onclick="ResetScanCount()">
+                        <span class="glyphicon glyphicon-refresh"></span> Reset
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@Scripts.Render("~/bundles/jquery")
+@Scripts.Render("~/Scripts/Barcodes/AddBarcodes.js")
+@Scripts.Render("~/bundles/knockout")
+
+
+<script>
+
+    var audioEmbed = document.getElementById("myAudio");
+
+    function playScanBeep() {
+        audioEmbed.play();
+    }
+
+    function resetBarcodeError(e) {
+        var errDisplay = document.getElementsByClassName('field-validation-valid text-danger');
+        errDisplay[0].innerHTML = '';
+    }
+
+    $(document).ready(function () {
+        ResetScanCount();
+
+        $("#configScan").addClass("sidebar-active");
+        $("#configReports").addClass("sidebar-inactive");
+        $("#configSettings").addClass("sidebar-inactive");
+        $("#configStatus").addClass("sidebar-inactive");
+        $("#configSearch").addClass("sidebar-inactive");
+
+        $("html, body").click(function (e) {
+            var exportResult = document.getElementById('ExportResult');
+            if (exportResult != null) {
+                exportResult.innerHTML = '';
+            }
+        });
+
+        if (@Html.Raw(Json.Encode(Model.ShowSenderDetails))) {
+            $('#senderDetailsSect').show();
+        }
+        else {
+            $('#senderDetailsSect').hide();
+        }
+        
+    });
+
+    function ResetScanCount() {
+        var scanCount = 0;
+        $('#SessionBarCodeScanCount').html(scanCount);
+        $("#barcodeTextBox").focus();
+    }
+
+    function ExportScannedBarCodes() {
+
+        var profileID = @Html.Raw(Html.Encode(Model.ProfileID));
+
+        $.ajax({
+            url: '/Operator/ExportScannedBarCodes',
+            type: 'POST',
+            data: { profileID: profileID },
+            success: function (response) {
+                if (!response.Success) {
+                    var errDisplay = document.getElementById('ExportResult');
+                    errDisplay.innerHTML = response.ErrorMessage;
+                    $('ExportResult').addClass('field-validation-valid text-danger');
+                }
+                else {
+                    var result = document.getElementById('ExportResult');
+                    result.innerHTML = response.SuccessMessage;
+                    $('ExportResult').removeClass('field-validation-valid text-danger');
+                }
+            },
+            failure: function (response) {
+                alert(response);
+            },
+            error: function (request, status, error) {
+                alert(status + ' ' + error + ' ' + request.responseText);
+            }
+        });
+    }
+</script>

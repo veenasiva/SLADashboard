@@ -1,0 +1,72 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27428.2037
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SLADashboard.Core", "SLADashboard.Core\SLADashboard.Core.csproj", "{2960655B-1331-4E4E-8567-CB82647AEF59}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SLADashboard.Infrastructure", "SLADashboard.Infrastructure\SLADashboard.Infrastructure.csproj", "{C295988E-1DE2-4058-9478-5DE21EB784ED}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SLADashboard.Web", "SLADashboard\SLADashboard.Web.csproj", "{66914778-B499-426F-859B-4CDB56C8FFBC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SLADashboard.WebTests", "SLADashboard.WebTests\SLADashboard.WebTests.csproj", "{F1E34B0F-8F6C-4419-9249-5F9B3E9B340D}"
+EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "SLADashboard.DB", "SLADashboard.DB\SLADashboard.DB.sqlproj", "{68D53364-1887-453B-87E0-F73E6B4D661B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2960655B-1331-4E4E-8567-CB82647AEF59}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2960655B-1331-4E4E-8567-CB82647AEF59}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2960655B-1331-4E4E-8567-CB82647AEF59}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2960655B-1331-4E4E-8567-CB82647AEF59}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C295988E-1DE2-4058-9478-5DE21EB784ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C295988E-1DE2-4058-9478-5DE21EB784ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C295988E-1DE2-4058-9478-5DE21EB784ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C295988E-1DE2-4058-9478-5DE21EB784ED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{66914778-B499-426F-859B-4CDB56C8FFBC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66914778-B499-426F-859B-4CDB56C8FFBC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66914778-B499-426F-859B-4CDB56C8FFBC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66914778-B499-426F-859B-4CDB56C8FFBC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F1E34B0F-8F6C-4419-9249-5F9B3E9B340D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1E34B0F-8F6C-4419-9249-5F9B3E9B340D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1E34B0F-8F6C-4419-9249-5F9B3E9B340D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1E34B0F-8F6C-4419-9249-5F9B3E9B340D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{68D53364-1887-453B-87E0-F73E6B4D661B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{68D53364-1887-453B-87E0-F73E6B4D661B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{68D53364-1887-453B-87E0-F73E6B4D661B}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{68D53364-1887-453B-87E0-F73E6B4D661B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{68D53364-1887-453B-87E0-F73E6B4D661B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{68D53364-1887-453B-87E0-F73E6B4D661B}.Release|Any CPU.Deploy.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {839336C3-2D07-4339-9E90-5220C43D81F4}
+	EndGlobalSection
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 6
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = http://decdev-tasql1:8080/tfs/deciphadev
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = SLADashboard.Core\\SLADashboard.Core.csproj
+		SccProjectName1 = SLADashboard.Core
+		SccLocalPath1 = SLADashboard.Core
+		SccProjectUniqueName2 = SLADashboard.Infrastructure\\SLADashboard.Infrastructure.csproj
+		SccProjectName2 = SLADashboard.Infrastructure
+		SccLocalPath2 = SLADashboard.Infrastructure
+		SccProjectUniqueName3 = SLADashboard\\SLADashboard.Web.csproj
+		SccProjectName3 = SLADashboard
+		SccLocalPath3 = SLADashboard
+		SccProjectUniqueName4 = SLADashboard.WebTests\\SLADashboard.WebTests.csproj
+		SccProjectName4 = SLADashboard.WebTests
+		SccLocalPath4 = SLADashboard.WebTests
+		SccProjectUniqueName5 = SLADashboard.DB\\SLADashboard.DB.sqlproj
+		SccProjectName5 = SLADashboard.DB
+		SccLocalPath5 = SLADashboard.DB
+	EndGlobalSection
+EndGlobal

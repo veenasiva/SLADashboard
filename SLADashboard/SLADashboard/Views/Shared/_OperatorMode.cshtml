@@ -1,0 +1,36 @@
+﻿@using System.Security.Principal;
+@using SLADashboard.Core;
+@using SLADashboard.Infrastructure;
+
+<div class="row text-center">
+    <div class="col-md-4">
+        <label style="font-size: 20px; margin-top:7px; color : white">Hello @(((WindowsIdentity)HttpContext.Current.User.Identity).Name.Split('\\')[1])</label>
+    </div>
+    <div class="col-md-8">
+
+        @if (((WindowsIdentity)HttpContext.Current.User.Identity).Groups.Where(_ => (_.Translate(typeof(NTAccount)).ToString().Contains(GroupHelper.GetAdminGroup()))).Any())
+        {
+            <div class="dropdown">
+                <button id="selected" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" style="font-size:20px;">
+                    @if (Session["mode"] != null)
+                    {
+                        @((Mode)Session["mode"])
+                    }
+                </button>
+                <ul class="dropdown-menu" style="font-size:20px;">
+                    <li>@Html.ActionLink("Administrator", "ChangeMode", "Admin", new { username = ((WindowsIdentity)HttpContext.Current.User.Identity).Name, mode = Mode.Administrator }, new { @class = "dropdown-item" })</li>
+                    <li>@Html.ActionLink("Operator", "ChangeMode", "Admin", new { username = ((WindowsIdentity)HttpContext.Current.User.Identity).Name, mode = Mode.Operator }, new { @class = "dropdown-item" })</li>
+                </ul>
+            </div>
+        }
+    </div>
+</div>
+
+@Scripts.Render("~/bundles/jquery")
+<script>
+
+    $('.dropdown-menu button').click(function () {
+        $('#selected').text($(this).text());
+    });
+</script>
+

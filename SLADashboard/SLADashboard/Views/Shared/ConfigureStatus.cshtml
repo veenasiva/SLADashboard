@@ -1,0 +1,220 @@
+﻿@using SLADashboard.Models
+@using SLADashboard.Infrastructure
+@model ConfigureStatusViewModel
+
+
+<script src="~/Scripts/jquery-3.3.1.min.js"></script>
+<script src="~/Scripts/moment.js"></script>
+<script src="~/Scripts/bootstrap-datetimepicker.min.js"></script>
+
+<link rel="stylesheet" href="~/Content/bootstrap-datetimepicker.min.css">
+
+
+
+<div class="row" style="margin-top:10px;">
+    <h2 class="col-md-1 col-md-offset-0" style="margin-top:1px;">Client</h2>
+    <div class="col-md-3 no-padding">
+        <select class="form-control" id="ClientSelect" name="ClientSelect" onchange="ClientChange(this)">
+            <option id="0" selected>All</option> @*Id "0" reserved for All*@
+            @foreach (var client in Model.Clients)
+            {
+                <option id="@client.ID">@client.Description</option>
+            }
+        </select>
+    </div>
+
+    <h2 class="col-md-1" style="margin-top:1px;">Profile</h2>
+    <div class="col-md-2 no-padding">
+        <div id="partial_ClientProfiles">
+            @{Html.RenderPartial("_ReportProfilesView", Model.Profiles);}
+        </div>
+    </div>
+</div>
+
+<div class="row" style="margin-top:10px;">
+
+</div>
+
+<div class="row" style="margin-top:35px">
+    <div class="col-md-8">
+        <div id="customDateRange" class="container">
+            <div class="row">
+                <div class="col-md-1 no-padding" style="margin-top:7px;">
+                    Start Date:
+                </div>
+                <div class='col-md-3'>
+                    <div class='input-group date' id='startDate'>
+                        <input type='text' class="form-control" />
+                        <span class="input-group-addon">
+                            <span class="glyphicon glyphicon-calendar"></span>
+                        </span>
+                    </div>
+                </div>
+                <div class='col-md-1 no-padding' style="margin-top:7px;">
+                    End Date:
+                </div>
+                <div class='col-md-3'>
+                    <div class='input-group date' id='endDate'>
+                        <input type='text' class="form-control" />
+                        <span class="input-group-addon">
+                            <span class="glyphicon glyphicon-calendar"></span>
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <button id="btnShow" type="button" class="btn btn-success" style="display:none" onclick="DisplayCustomReport()">Show</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="partial_TableStatus">
+            @{Html.RenderPartial("_TableStatusView", new List<TableStatus>()); }
+        </div>
+    </div>
+</div>
+
+<div id="SelectedClient">
+</div>
+<div id="SelectedProfile">
+</div>
+<div id="SelectedReport">
+</div>
+
+<div id="DateRangeFrom">
+</div>
+
+<div id="DateRangeTo">
+</div>
+<script>
+
+  
+    function DisplayCustomReport() {
+
+        var data = {
+            ProfileID: $('#SelectedProfile').val(),
+            ClientID: $('#SelectedClient').val(),
+            DateFrom: $("#DateRangeFrom").val(),
+            DateTo: $("#DateRangeTo").val()
+        }
+
+        $.ajax({
+            url: '/Operator/TableStatus',
+            type: 'POST',
+            data: { statusData: ko.toJSON(data) },
+            success: function (data) {
+                $('#partial_TableStatus').html(data);
+            },
+            failure: function (response) {
+                alert(response);
+            },
+            error: function (request, status, error) {
+                alert(status + ' ' + error + ' ' + request.responseText);
+            }
+        });
+
+
+    }
+
+    function ClientChange(client) {
+        var clientID = 0;
+        if (client.selectedIndex == 0) {
+            // All Clients have been selected
+            $('#SelectedProfile').val(0); // Set to all profiles
+            document.getElementById("ProfileSelect").selectedIndex = 0;
+            document.getElementById("ProfileSelect").disabled = true;
+        }
+        else {
+            document.getElementById("ProfileSelect").disabled = false;
+            clientID = client[client.selectedIndex].id;
+            LoadProfilesForClient(clientID);        
+        }
+        $('#SelectedClient').val(clientID);
+        DisplayCustomReport();
+    };
+
+    function ProfileChange(profile) {
+        var profileID = profile[profile.selectedIndex].id;
+        $('#SelectedProfile').val(profileID);
+        DisplayCustomReport();
+    };
+
+    function LoadProfilesForClient(clientID) {
+
+        $.ajax({
+            url: '/Operator/LoadProfilesForClient',
+            type: 'POST',
+            data: { clientID: clientID },
+            success: function (data) {
+                $('#partial_ClientProfiles').html(data);
+                $('#SelectedProfile').val(0); //Default to All Profiles
+            },
+            failure: function (response) {
+                alert(response);
+            },
+            error: function (request, status, error) {
+                alert(status + ' ' + error + ' ' + request.responseText);
+            }
+        });
+    }
+
+    $(document).ready(function () {
+
+        $("#configStatus").addClass("sidebar-active").siblings().removeClass("sidebar-active");
+        $("#configScan").addClass("sidebar-inactive");
+        $("#configSettings").addClass("sidebar-inactive");
+        $("#configReports").addClass("sidebar-inactive");
+        $("#configSearch").addClass("sidebar-inactive");
+
+        var selectedClientID = 0; // Default to All Clients
+        $('#SelectedClient').val(selectedClientID);
+        $('#SelectedProfile').val(0); //Default to All Profiles
+        document.getElementById("ProfileSelect").disabled = true;
+
+        var todayDate = new Date().getDate();
+
+        $('#DateRangeTo').val(new Date(new Date().setDate(todayDate)));
+        $('#DateRangeFrom').val(new Date(new Date().setDate(todayDate)));
+
+        $('#startDate').datetimepicker({
+            format: 'DD/MM/YYYY',//'DD MMMM YYYY',
+            defaultDate: new Date(new Date().setDate(todayDate)),
+            maxDate: new Date(new Date().setDate(todayDate))
+        }).on('dp.change', function (e) {
+            var formatedValue = e.date.format(e.date._f);
+            $('#DateRangeFrom').val(formatedValue);
+
+            var endDate = new Date($('#endDate').data("DateTimePicker").date());
+            var startDate = new Date(e.date);
+
+            if (endDate < startDate) {
+                $('#endDate').data("DateTimePicker").date(startDate);  
+                $('#DateRangeTo').val(formatedValue);
+            }
+            $('#endDate').data("DateTimePicker").minDate(startDate);
+            DisplayCustomReport();
+
+            });
+
+        $('#endDate').datetimepicker({
+            format: 'DD/MM/YYYY',//'DD MMMM YYYY',
+            maxDate: new Date(new Date().setDate(todayDate)),
+            defaultDate: new Date(new Date().setDate(todayDate))
+        }).on('dp.change', function (e) {
+            var formatedValue = e.date.format(e.date._f);
+            $('#DateRangeTo').val(formatedValue);
+
+            var startDate = new Date($('#startDate').data("DateTimePicker").date());
+            var endDate = new Date(e.date);
+
+            if (startDate > endDate) {
+                $('#startDate').data("DateTimePicker").date(endDate);
+                $('#DateRangeFrom').val(formatedValue);
+            } 
+            $('#startDate').data("DateTimePicker").maxDate(endDate);
+            DisplayCustomReport();
+        });
+
+
+        DisplayCustomReport();
+    });
+</script>

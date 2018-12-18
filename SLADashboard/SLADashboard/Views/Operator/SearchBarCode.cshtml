@@ -1,0 +1,79 @@
+﻿@using SLADashboard.Models
+@using SLADashboard.Infrastructure
+@model ConfigureBarCodeSearchViewModel
+
+<script src="~/Scripts/jquery-3.3.1.min.js"></script>
+<script src="~/Scripts/moment.js"></script>
+
+
+<style>
+
+    .form-control:focus {
+        border-color: #0000FF;
+        box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(0, 0, 255, 0.6);
+    }
+
+    #barcodeTextBox {
+        margin-left: 20px;
+        margin-top: 15px;
+        font-size: 2em;
+        min-width: 350px;
+    }
+</style>
+
+
+<audio id="myAudio">
+    <source src="~/Content/Sounds/scanner-beep.mp3" type="audio/mpeg">
+</audio>
+
+<div class="row">
+    <div class="col-md-6 col-md-offset-1">
+
+        @using (Html.BeginForm("SubmitBarCodeSearch", "Operator", FormMethod.Post, new { id = "SearchBarCodesForm", @class = "form-horizontal", role = "form", data_bind = "submit: submitBarCodeSearch" }))
+        {
+            <div class="form-group" style="margin-top:30px;">
+                <span class="col-md-2" style="margin-top:10px; font-size: 30px;">BarCode</span>
+                <div class="col-md-10">
+                    @Html.TextBoxFor(m => m.BarCodeNumber, new { id = "barcodeTextBox", placeholder = "", @class = "form-control", data_bind = "textInput : barCodeNumber", @onchange = "resetBarcodeError(this);" })
+                    @Html.ValidationMessageFor(m => m.BarCodeNumber, "", new { @class = "text-danger", @style = "margin-top:10px;" })
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="row" style="margin-top:50px">
+    <div id="partial_SearchBarCodeReport">
+        @*@{Html.RenderPartial("_SearchBarCodeView", new List<ConfigureBarCodeSearchViewModel>()); }*@
+    </div>
+</div>
+
+@Scripts.Render("~/bundles/jquery")
+@Scripts.Render("~/Scripts/Barcodes/SearchBarcodes.js")
+@Scripts.Render("~/bundles/knockout")
+
+
+<script>
+
+    var audioEmbed = document.getElementById("myAudio");
+
+    function playScanBeep() {
+        audioEmbed.play();
+    }
+
+    function resetBarcodeError(e) {
+        var errDisplay = document.getElementsByClassName('field-validation-valid text-danger');
+        errDisplay[0].innerHTML = '';
+    }
+
+    $(document).ready(function () {
+
+        $("#configReports").addClass("sidebar-inactive");
+        $("#configScan").addClass("sidebar-inactive");
+        $("#configSettings").addClass("sidebar-inactive");
+        $("#configStatus").addClass("sidebar-inactive");
+        $("#configSearch").addClass("sidebar-active").siblings().removeClass("sidebar-active");
+        $("#barcodeTextBox").focus();
+    });
+
+</script>

@@ -1,0 +1,85 @@
+﻿@using SLADashboard.Models;
+
+@model SLAViewModel
+
+
+@using (Ajax.BeginForm("UpdateSLA", "Admin", new AjaxOptions { InsertionMode = InsertionMode.Replace, HttpMethod = "POST", OnBegin = "BeginClient", OnSuccess = "editDatabaseSuccess" }, new { id = "__AjaxAntiForgeryForm" }))
+{
+	@Html.AntiForgeryToken();
+	<div id="SelectedClient">
+	</div>
+	<div id="SelectedProfile">
+	</div>
+	@Html.Hidden("ProfileID", Model.ProfileID)
+	<div class="row" style="width:90%">
+
+		<table class="table table-striped" style="width:100%">
+			<tr class="row">
+				<td>@Html.LabelFor(model => model.Name)</td>
+				<td>
+					@Html.TextBoxFor(model => model.Name, new { id = "name", @class = "editfield form-control", @placeholder = "Name" })
+					@Html.ValidationMessageFor(x => x.Name, "", new { @class = "text-danger" })
+				</td>
+			</tr>
+			<tr class="row">
+				<td>@Html.LabelFor(model => model.Description)</td>
+				<td>
+					@Html.TextAreaFor(model => model.Description, new { id = "description", @class = "editfield form-control", @placeholder = "Description" })
+					@Html.ValidationMessageFor(x => x.Description, "", new { @class = "text-danger" })
+				</td>
+			</tr>
+			<tr class="row">
+				<td>@Html.LabelFor(model => model.Target)</td>
+				<td>
+					@Html.TextBoxFor(model => model.Target, new { id = "target", @type = "number", @class = "editfield form-control", @placeholder = "Target" })
+					@Html.ValidationMessageFor(x => x.Target, "", new { @class = "text-danger" })
+				</td>
+			</tr>
+			<tr class="row">
+				<td>
+					<input type="submit" class="btn btn-success btn-block" value="Save" />
+				</td>
+				<td>@Html.Hidden("ID", Model.ID)</td>
+			</tr>
+		</table>
+		<div id="ExportResult" style=" width:100%"></div>
+	</div>
+	@Html.HiddenFor(m => m.Client.ID);
+	@Html.HiddenFor(m => m.Profile.ID);
+
+}
+
+<script src="~/Scripts/jquery.validate.min.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+
+<script>
+	function editDatabaseSuccess(data) {
+		if (!data.Success) {
+			alert(data.ErrorMessage);
+
+		}
+		else {
+			$("#editForm").dialog("close");
+			var url = '@Url.Action("SLADefinition", "Admin")'
+			loadDatabases( @Html.Raw(Json.Encode(Model.Profile.ID)), url);
+		}
+	}
+	$(document).ready(function () {
+	let clientId = @Html.Raw(Json.Encode(Model.Client.ID));
+	let profileId = @Html.Raw(Json.Encode(Model.Profile.ID));
+		$('#SelectedClient').val(clientId);
+		$('#SelectedProfile').val(profileId);
+});
+	function BeginClient(xhr) {
+
+		securityToken = $('[name=__RequestVerificationToken]').val();
+		xhr.setRequestHeader('__RequestVerificationToken', securityToken);
+	}
+	$.ajaxSetup({
+		'beforeSend': function (xhr) {
+			securityToken = $('[name=__RequestVerificationToken]').val();
+			xhr.setRequestHeader("__RequestVerificationToken", securityToken);
+		}
+	});
+
+</script>

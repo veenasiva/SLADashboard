@@ -1,0 +1,196 @@
+﻿@using System;
+@using System.Collections;
+@using SLADashboard.Models;
+@using SLADashboard.Infrastructure;
+@using SLADashboard.Core;
+
+@model ConfigureSLAValuesViewModel
+@{
+	ViewBag.Title = "Update SLA Values";
+}
+
+@Styles.Render("~/Styles/SLA.css")
+@if ((Mode)Session["mode"] == Mode.Administrator)
+{
+	<div class="border-content" style="position:relative ;width:95%; background-color:rgba(255, 0, 0, 0.7); color:white; border-radius:20px;">
+		<div style="position:absolute;top:8px; left:35px;">* Data entered in Admin Mode will not be saved</div>
+		<h1 style="text-align:center">@ViewBag.clientname </h1>
+		<h1 style="text-align:center">@ViewBag.profilename</h1>
+	</div>
+}
+else
+{
+	<div class="border-content" style="width:95%; background-color:rgba(0, 0, 0, 0.25); color:white; border-radius:20px;">
+		<h1 style="text-align:center">@ViewBag.clientname </h1>
+		<h1 style="text-align:center">@ViewBag.profilename</h1>
+	</div>
+}
+<br />
+<div class="row" style="margin-top:10px;">
+	<h4 class="col-md-1 col-md-offset-1" style="margin-top:1px;">Year</h4>
+	<div class="col-md-3 no-padding">
+		<select class="form-control" id="YearSelect" name="YearSelect" onchange="YearChange(this)">
+			@foreach (var year in Model.Years)
+			{
+				<option id="@year.key" value="@year.key" @(year.key == Model.SelectedYear ? "selected='selected'" : "")>@year.value</option>
+			}
+		</select>
+	</div>
+
+	<h4 class="col-md-1" style="margin-top:1px;">Month</h4>
+	<div class="col-md-2 no-padding">
+		<div id="partial_Month">
+			@*@{Html.RenderPartial("_MonthsListView", Model.Months);}*@
+			<select class="form-control" id="MonthSelect" name="MonthSelect" onchange="MonthChange(this)">
+
+				@foreach (var month in Model.Months)
+				{
+					<option id="@month.key" @(month.key == Model.SelectedMonth ? "selected='selected'" : "")>@month.value</option>
+				}
+			</select>
+		</div>
+	</div>
+
+</div>
+
+<div class="row" style="margin-top:35px;width:100%">
+	<div class="col-md-8" style="width:100%">
+		<div id="ExportResult" style=" width:100%"></div>
+		<div id="partial_SLAValues" style="width:100%">
+			@{Html.RenderPartial("_SLAValuesView", new SLAValuesTableModel()); }
+		</div>
+	</div>
+</div>
+
+@Html.HiddenFor(m => m.ProfileID)
+<script>
+	$(document).ready(function () {
+		//selectedOption();
+		//selectedOption = function () {
+		selectYear = document.getElementById("YearSelect");
+		selectMonth = document.getElementById("MonthSelect");
+		MonthChange(selectMonth);
+	});
+
+	function YearChange(year) {
+		var year = year[year.selectedIndex].id;
+		LoadMonthsForYear(year);
+
+	};
+	function LoadMonthsForYear(year) {
+		$.ajax({
+			url: '@Url.Action("LoadMonthsForYear", "Operator")' ,
+			type: 'POST',
+			data: { year: year },
+			success: function (data) {
+				$('#partial_Month').html(data);
+				//$('#SelectedProfile').val(0); //Default to All Profiles
+			},
+			failure: function (response) {
+				alert(response);
+			},
+			error: function (request, status, error) {
+				alert(status + ' ' + error + ' ' + request.responseText);
+			}
+		});
+		selectMonth = document.getElementById("MonthSelect");
+		var month = @Model.SelectedMonth;
+		var att = document.createAttribute("selected");
+		att.value = "selected";
+
+		for (var j = 0; j < selectMonth.length; j++) {
+
+			if (selectMonth[j].id == month) {
+				return selectMonth[j].setAttributeNode(att);
+			}
+		};
+	}
+	function MonthChange(month) {
+	let profileId = @Html.Raw(Json.Encode(Model.ProfileID));
+		var year = document.getElementById("YearSelect")[document.getElementById("YearSelect").selectedIndex].id;
+		var month = month[month.selectedIndex].id;
+
+		var msDay = 60 * 60 * 24 * 1000;
+		var currentDate = new Date();
+		var selectedDate = new Date(year, month-1);
+		
+		if (Math.floor((currentDate - selectedDate) / msDay) > 60)
+			alert("You have selected a date which is before 2 months,Please make sure before you modify the data");
+
+		$('#SelectedYear').val(year);
+		$('#SelectedMonth').val(month);
+		var result = document.getElementById('ExportResult');
+		result.innerHTML = "";
+		var token = $("#__AjaxAntiForgeryForm input").val();
+		var dataObject = {
+			__RequestVerificationToken: token
+		};
+		$.ajax({
+			url:'@Url.Action("SLAValuesTable", "Operator")' ,
+			type: 'POST',
+			data: {
+				profileId: profileId,
+				selectedYear: year,
+				selectedMonth: month
+			},
+			headers: dataObject,
+			success: function (data) {
+				$('#partial_SLAValues').html(data);
+			},
+			failure: function (response) {
+				alert(response);
+			},
+			error: function (request, status, error) {
+				alert(status + ' ' + error + ' ' + request.responseText);
+			}
+		});
+
+	};
+
+	function editDatabaseSuccess(data) {
+		if (!data.Success) {
+			var errDisplay = document.getElementById('ExportResult');
+			errDisplay.innerHTML = data.ErrorMessage;
+			$('#ExportResult').addClass('field-validation-valid text-danger');
+			
+		}
+		else {
+			//var errDisplay = document.getElementById('ExportResult');
+			$('#ExportResult').removeClass('field-validation-valid text-danger');
+			//errDisplay.innerHTML = data.SuccessMessage;
+			let profileId = @Html.Raw(Json.Encode(Model.ProfileID));
+			var year = document.getElementById("YearSelect")[document.getElementById("YearSelect").selectedIndex].id;
+			var month = document.getElementById("MonthSelect")[document.getElementById("MonthSelect").selectedIndex].id;;
+			var url = '@Url.Action("SLAValuesTable", "Operator")'
+			$.ajax({
+				url: url,
+				type: 'POST',
+				data: {
+					profileId: profileId,
+					selectedYear: year,
+					selectedMonth: month
+				},
+				success: function (data) {
+					$('#partial_SLAValues').html(data);
+				},
+				failure: function (response) {
+					alert(response);
+				},
+				error: function (request, status, error) {
+					alert(status + ' ' + error + ' ' + request.responseText);
+				}
+			});
+			var result = document.getElementById('ExportResult');
+			result.innerHTML = "Saved Successfully";
+			//$('ExportResult').removeClass('field-validation-valid text-danger');
+		}
+	}
+	function showErrorResponse(data) {
+		
+			var errDisplay = document.getElementById('ExportResult');
+
+			$('ExportResult').addClass('field-validation-valid text-danger');
+			errDisplay.innerHTML = data.ErrorMessage;
+		
+	}
+</script>

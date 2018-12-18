@@ -1,0 +1,61 @@
+﻿@using SLADashboard.Models;
+
+@model SLAListViewModel
+@{
+	ViewBag.Title = "SLA Definition";
+}
+
+<h4>Client: @Model.Client.Description</h4>
+<h4>Profile: @Model.Profile.Description</h4>
+<div id="SelectedClient">
+</div>
+<div id="SelectedProfile">
+</div>
+@*@Scripts.Render("~/Scripts/jquery-3.3.1.js")*@
+@Scripts.Render("~/Scripts/moment.js")
+
+@Styles.Render("~/Styles/SLA.css")
+
+	<div class="row" style="margin-top:15px;width:100%">
+		<div class="col-md-11">
+			<div id="partial_SLADefinition">
+				@{Html.RenderPartial("_SLADefinitionsView", new SLADefinitionListViewModel()); }
+			</div>
+		</div>
+		@Html.HiddenFor(m => m.Client.ID)
+		@Html.HiddenFor(m => m.Profile.ID)
+	</div>
+
+<script type="text/javascript">
+
+	$(document).ready(function () {
+		$("#configSettings").addClass("sidebar-active").siblings().removeClass("sidebar-active");
+		$("#configScan").addClass("sidebar-inactive");
+		$("#configReports").addClass("sidebar-inactive");
+		//populate data in partial view
+		let profileId = @Html.Raw(Json.Encode(Model.Profile.ID));
+		var token = $("#__AjaxAntiForgeryForm input").val();
+		var dataObject = {
+			__RequestVerificationToken: token
+		};
+		$.ajax({
+			url:'@Url.Action("SLADefinition", "Admin")' ,
+			type: 'POST',
+			data: {
+				profileID: profileId, __RequestVerificationToken: token
+			},
+			headers: dataObject,
+			success: function (data) {
+				$('#partial_SLADefinition').html(data);
+			},
+			failure: function (response) {
+				alert(response);
+			},
+			error: function (request, status, error) {
+				alert(status + ' ' + error + ' ' + request.responseText);
+			}
+		});
+
+	});
+</script>
+

@@ -1,0 +1,149 @@
+﻿@using SLADashboard.Models;
+@using Newtonsoft.Json
+
+@model AddProfileViewModel
+@{
+	ViewBag.Title = "Profile";
+}
+
+<div class="row">
+	<div class="col-md-5">
+		<h2>Client: @Model.Client.Description</h2>
+	</div>
+
+	<div id="SelectedClient">
+	</div>
+	<div id="SelectedProfile">
+	</div>
+</div>
+
+<div class="row">
+
+	<div class="col-md-8" style="padding-left:0px;padding-right:0px;width:70%;">
+		@using (Html.BeginForm("AddProfile", "Admin", FormMethod.Post, new { id = "AddProfileForm", @class = "form-horizontal", role = "form", data_bind = "submit: submitAddProfile" }))
+		{
+			<div class="border-content add-profile-border">
+				<div class="row">
+					<div class="col-md-9">
+						<p>Don't see the profile on the list? Add a new one...</p>
+						<div class="form-group">
+							<label class="col-md-3" style="margin-top:7px;">Name</label>
+							<div class="col-md-6">
+								@Html.TextBoxFor(m => m.NewProfileName, new { id = "profileNameTextBox", placeholder = "Name...", @class = "form-control", data_bind = "value: NewProfileName" })
+								@Html.ValidationMessageFor(m => m.NewProfileName, "", new { @class = "text-danger", @id = "NewProfileName" })
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-md-3" style="margin-top:7px;">Description</label>
+							<div class="col-md-6">
+								@Html.TextBoxFor(m => m.NewProfileDescription, new { id = "profileDescriptionTextBox", placeholder = "Description...", @class = "form-control", data_bind = "value: NewProfileDescription" })
+								@Html.ValidationMessageFor(m => m.NewProfileDescription, "", new { @class = "text-danger", @id = "NewProfileDescription" })
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-md-3" style="margin-top:7px;">SLA ID Prefix</label>
+							<div class="col-md-6">
+								@Html.TextBoxFor(m => m.NewProfileIDPrefix, new { id = "profileIDPrefixTextBox", placeholder = "ID Prefix...", @class = "form-control", data_bind = "value: NewProfileIDPrefix" })
+								@Html.ValidationMessageFor(m => m.NewProfileIDPrefix, "", new { @class = "text-danger", @id = "NewProfileIDPrefix" })
+							</div>
+						</div>
+					</div>
+					<div class="col-md-3">
+						<a class="btn icon-btn btn-success add-profile" href="#" type="submit" onclick="submitAddProfileForm()" id="btnAddProfile" actionurl="@Url.Action("AddProfile","Admin")">
+							<span class="glyphicon btn-glyphicon glyphicon-plus img-circle text-success"></span>
+							Add Profile
+						</a>
+					</div>
+				</div>
+			</div>
+			@Html.HiddenFor(m => m.Client.ID);
+		}
+	</div>
+	@using (Html.BeginForm(null, null, FormMethod.Post, new { id = "__AjaxAntiForgeryForm" }))
+	{
+		@Html.AntiForgeryToken();
+	}
+		<div class="col-md-8" style="padding-left:0px;padding-right:0px;width:30%;">
+			<div id="profilesList">
+				@foreach (var profile in Model.Profiles.OrderBy(_ => _.Name))
+				{
+					<div id=@profile.ID class="row profile-listing" onclick="HandleProfileClick(this)">
+						<div class="col-md-3">
+							<div class="profile-image"><img src="~/Content/Images/Client_Profile.png" /></div>
+						</div>
+						<div class="col-md-9">
+							<div class="desc">
+								<p class="title"><span>Name: <strong>@profile.Name</strong></span></p>
+								<span>Description: <strong>@profile.Description</strong></span>
+							</div>
+						</div>
+					</div>
+				}
+			</div>
+		</div>
+	
+</div>
+	
+@Styles.Render("~/Styles/SLA.css")
+@Scripts.Render("~/bundles/jquery")
+@Scripts.Render("~/Scripts/Profiles/AddProfile.js")
+@Scripts.Render("~/bundles/knockout")
+<script>
+
+    function submitAddProfileForm() {
+        $('#AddProfileForm').submit();
+    }
+
+
+    $(document).ready(function () {
+        $("#configSettings").addClass("sidebar-active").siblings().removeClass("sidebar-active");
+        $("#configScan").addClass("sidebar-inactive");
+        $("#configReports").addClass("sidebar-inactive");
+
+        var data = @Html.Raw(Json.Encode(Model.Profiles.Select(_ => new {ID = _.ID })));
+
+        for (var i = 0; i < data.length; i++) {
+
+            let id = parseInt(data[i].ID);
+            let element = document.getElementById(id);
+            element.addEventListener("mouseover", function () {
+                $("#" + id).addClass('profile-glow');
+            });
+
+            element.addEventListener("mouseout", function () {
+              $("#" + id).removeClass('profile-glow');
+            });
+
+        }
+    });
+
+    function HandleProfileClick(e) {
+        let clientId = @Html.Raw(Json.Encode(Model.Client.ID));
+		var token = $("#__AjaxAntiForgeryForm input").val();
+		var dataObject = {
+			__RequestVerificationToken: token
+		};
+
+        $('#SelectedClient').val(clientId);
+        $('#SelectedProfile').val(e.id);
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("ConfigureSLA", "Admin")', //'/Admin/ConfigureSLA',
+            data: {
+                clientId: clientId,
+				profileID: e.id
+			},
+			headers: dataObject,
+            success: function (response) {
+                window.location.href = '@Html.Raw(Url.Action("ConfigureSLA", "Admin", new { @clientId = "CID", @profileId = "PID" }))'.replace("CID", $('#SelectedClient').val()).replace("PID", $('#SelectedProfile').val())
+        },
+        failure: function (response) {
+                        alert(response);
+                    },
+        error: function (request, status, error) {
+                        alert(status + ' ' + error + ' ' + request.responseText);
+                    }
+                });
+    }
+
+</script>

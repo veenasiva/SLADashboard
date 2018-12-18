@@ -1,0 +1,21 @@
+﻿@using SLADashboard.Core;
+@model List<Client>
+
+@foreach (var client in Model.OrderBy(_ => _.Description))
+{
+    <li id="Client-@client.ID" class="add-clients">
+        <artdeco-toggle-pill checked="" type="toggle" class="ember-view">
+            <button id="btnClient" type="button" data-id=@client.ID name='@client.Description' aria-pressed="true" data-ember-action="" onclick="HandleSelectFromListClientClick(this)" onmouseover="ClientMouseOver(this)" onmouseout="ClientMouseOut(this)" data-ember-action-11105="11105" actionurl="@Url.Action("ConfigureProfile","Admin")">
+                <span class="artdeco-pill-icons">
+                    <li-icon aria-hidden="true" type="plus-icon" size="small">
+                        <svg viewBox="0 0 24 24" width="24px" height="24px" x="0" y="0" preserveAspectRatio="xMinYMin meet" class="artdeco-icon" focusable="false">
+                            <path d="M14,9H9v5H7V9H2V7H7V2H9V7h5V9Z" class="small-icon" style="fill-opacity: 1"></path>
+                        </svg>
+                    </li-icon>
+                </span>
+                <span class="artdeco-pill-label-text">@client.Description</span>
+            </button>
+        </artdeco-toggle-pill>
+    </li>
+}
+

@@ -1,0 +1,11 @@
+﻿@using SLADashboard.Core
+@model List<Profile>
+
+<select class="form-control" id="ProfileSelect" name="ProfileSelect" onchange="ProfileChange(this)">
+    <option id="0" selected>All</option> @*Id "0" reserved for All*@ 
+    @foreach (var profile in Model)
+    {
+        <option id="@profile.ID">@profile.Name</option>
+    }
+</select>
+

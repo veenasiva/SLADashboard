@@ -1,0 +1,17 @@
+﻿@using SLADashboard.Core;
+@model IEnumerable<Site>
+
+@foreach (var state in Model.OrderBy(_ => _.StateName))
+{
+    <li id="Site-@state.ID" class="add-clients">
+        <artdeco-toggle-pill-site-sel checked="" type="toggle" class="ember-view">
+            <button type="button" data-id=@state.ID name='@state.StateName' aria-pressed="true" data-ember-action="" onclick="HandleSelectedListSiteClick(this)" onmouseover="SelectedSiteMouseOver(this)" onmouseout="SelectedSiteMouseOut(this)" data-ember-action-11105="11105">
+                <span class="artdeco-pill-icons">
+                    <li-icon aria-hidden="true" type="check-icon" size="small"><svg viewBox="0 0 24 24" width="24px" height="24px" x="0" y="0" preserveAspectRatio="xMinYMin meet" class="artdeco-icon" focusable="false"><path d="M15,3L6.57,13.72A0.7,0.7,0,0,1,6,14a0.72,0.72,0,0,1-.56-0.27L1,8.07,2.36,7,6,11.72,13.68,2Z" class="small-icon" style="fill-opacity: 1"></path></svg></li-icon>
+                </span>
+                <span class="artdeco-pill-label-text"> @state.StateName</span>
+            </button>
+        </artdeco-toggle-pill-site-sel>
+    </li>
+}
+

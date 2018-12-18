@@ -1,0 +1,221 @@
+﻿@using SLADashboard.Models;
+
+@model SLAListViewModel
+@{
+	var grid = new WebGrid(Model.Sla, canPage: true, rowsPerPage: 10);
+}
+
+<style>
+
+	.container .btn-group .active {
+		background-color: royalblue;
+		color: white;
+	}
+
+	.label_Barcode {
+		font-size: 1.5em;
+	}
+
+	.form-control-spacing {
+		margin-bottom: 15px;
+	}
+
+	.form-control:focus {
+		border-color: #0000FF;
+		box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(0, 0, 255, 0.6);
+	}
+
+	.xmlbarcode-image {
+		height: 157px;
+		width: 157px;
+	}
+
+	.form-spacing {
+		margin-top: 15px;
+	}
+
+	.label-offset {
+		margin-top: 7px;
+	}
+
+	input[type=checkbox] {
+		/* Double-sized Checkboxes */
+		-ms-transform: scale(1.5); /* IE */
+		-moz-transform: scale(2); /* FF */
+		-webkit-transform: scale(2); /* Safari and Chrome */
+		-o-transform: scale(2); /* Opera */
+		padding: 10px;
+	}
+</style>
+
+<h2>Client: @Model.Client.Description</h2>
+<h2>Profile: @Model.Profile.Description</h2>
+
+@using (Html.BeginForm("ConfigureSLA", "Admin", FormMethod.Post, new { id = "SLAForm", @class = "form-horizontal", role = "form", data_bind = "submit: submitSLA" }))
+{
+	@MvcHtmlString.Create(
+		grid.GetHtml(
+			htmlAttributes: new
+			{
+				id = "grid",
+				@class = "table table-bordered table-striped table-condensed"
+			},
+			emptyRowCellValue: "No Records Found",
+			headerStyle: "label_SLA",
+
+			columns: grid.Columns(
+
+					grid.Column("Name", "Name", @<text><span class="hidden"><label id="lblID">@item.Value.ID</label></span> <span class="display"><label id="lblName">@item.Value.Name</label></span>
+					<input type="text" class="hidden edit" id="inID" value="@item.Value.ID" style="display:none" />
+					<input type="text" class="edit" id="inName" value="@item.Value.Name" style="display:none;width:90%" />
+					</text>),
+			grid.Column("Description", "Description", @<text> <span class="display"><label id="lblDescription">@item.Value.Description</label></span>
+			@*<input type="text" class="edit" id="inDescription" value="@item.Value.Description" style="display:none" />*@
+<textarea class="edit" id="inDescription" style="display:none;width:150%">@item.Value.Description</textarea>
+			</text>),
+						grid.Column("Target", "Target", @<text> <span class="display"><label id="lblTarget">@item.Value.Target</label></span>
+						<input type="text" class="edit" id="inTarget" value="@item.Value.Target" style="display:none" />
+						</text>),
+									grid.Column("", "", format: @<text>
+										<a href='#' class="display edit-btn"><span class="glyphicon btn-glyphicon glyphicon-pencil text-info"></span></a>
+										<a href='#' class="edit save-btn"><span class="glyphicon btn-glyphicon glyphicon-share text-info"></span></a>
+										<a href="#" class="edit cancel-btn"><span class="glyphicon btn-glyphicon glyphicon-remove text-info"></span></a>
+										<a href="#" class="display delete-btn"><span class="glyphicon btn-glyphicon glyphicon-trash text-danger"></span></a>
+									</text>)
+												)
+												)
+												.ToString()
+
+												)
+}
+
+
+@Scripts.Render("~/bundles/jquery")
+@Scripts.Render("~/Scripts/Barcodes/UpdateBarCodeConfig.js")
+@Scripts.Render("~/bundles/knockout")
+
+<script type="text/javascript">
+	$(function () {
+		//Add controls for new record addition
+		var tfootAdd = "<tr class='tfootrow'>" +
+			"<td> " +
+			"<a href='#' class='display ins-btn' ><span class='glyphicon btn-glyphicon glyphicon-pencil text-info'></span></a>" +
+			"<a href='#' class='edit inssave-btn'><span class='glyphicon btn-glyphicon glyphicon-share text-info'></span></a>" +
+			"<a href='#' class='edit cancel-btn'><span class='glyphicon btn-glyphicon glyphicon-remove text-info'></span></a>" +
+			"</td>" +
+			"<td>" +
+			"<span class='display'/>" +
+			"<input type='text' id='inName' value='' class = 'edit'/> " +
+			"</td>" +
+			"<td>" +
+			"<span class='display'/>" +
+			"<input type='text' id='inDescription' value='' class = 'edit'/>" +
+			"</td>" +
+			"<td>" +
+			"<span class='display'/>" +
+			"<input type='text' id='inTarget' value='' class = 'edit'/>" +
+			"</td>" +
+			"</tr>"
+		$("table tfoot tr:first").before(tfootAdd);
+
+		$('.edit').hide();
+		$('.ins-btn, .edit-btn, .cancel-btn').on("click", function () {
+			var tr = $(this).parents('tr:first');
+			tr.find('.edit, .display').toggle();
+		});
+		//Update values
+		$('.save-btn').on("click", function () {
+
+			var tr = $(this).parents('tr:first');
+			var id = tr.find("#inID").val();
+			var name = tr.find("#inName").val();
+			var description = tr.find("#inDescription").val();
+			var target = tr.find("#inTarget").val();
+			var isSuccess = -1;
+			//populate values in corresponding label
+			tr.find("#lblName").text(name);
+			tr.find("#lblDescription").text(description);
+			tr.find("#lblTarget").text(target);
+			var SLA =
+				{
+					"ID": id,
+					"Name": name,
+					"Description": description,
+					"Target": target
+				};
+
+			$.ajax({
+				url: '/Admin/UpdateSLA/',
+				data: JSON.stringify(SLA),
+				type: 'POST',
+				contentType: 'application/json; charset=utf-8',
+				success: function (result) {
+					isSuccess = result;
+				},
+				error: function (result) {
+					isSuccess = result;
+				}
+
+			}).done(function () {
+				if (isSuccess == "1") {           // Successfully saved
+					tr.find('.edit, .display').toggle();
+					alert("Successfully Saved");
+				}
+				else {                      // Data Error
+					alert("Error. Please, check the data");
+				}
+			});
+
+		});
+		//Delete an item
+		$('.delete-btn').on("click", function () {
+
+			var tr = $(this).parents('tr:first');
+			var id = tr.find("#inID").val();
+			var name = tr.find("#inName").val();
+			var description = tr.find("#inDescription").val();
+			var target = tr.find("#inTarget").val();
+			var isSuccess = -1;
+
+			var SLA =
+				{
+					"ID": id,
+					"Name": name,
+					"Description": description,
+					"Target": target
+				};
+
+			$.ajax({
+
+				url: '/Admin/DeleteSLA/',
+				data: JSON.stringify(SLA),
+				type: 'POST',
+				contentType: 'application/json; charset=utf-8',
+				success: function (result) {
+					isSuccess = result;
+
+				},
+				error: function (result) {
+					isSuccess = result;
+				}
+
+			}).done(function () {
+				if (isSuccess == "1") {           // Successfully Deleted
+					alert("Successfully Deleted");
+					location.reload();      // refresh the page
+				}
+				else {                      // Data Error
+					alert("Error. Please, check the data");
+				}
+
+			});
+
+
+		});
+		//Insert intem
+		$('.inssave-btn').on("click", function () {
+
+		});
+	});
+
+</script>

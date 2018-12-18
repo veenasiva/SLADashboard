@@ -1,0 +1,64 @@
+﻿@using SLADashboard.Models;
+@model SLAValuesTableModel
+
+@{
+	var grid = new WebGrid(Model.SlaValues, ajaxUpdateContainerId: "userGrid", rowsPerPage: 10);
+}
+
+<div class="container" style="width:100%">
+	@using (Ajax.BeginForm("SLAValues", "Operator", new AjaxOptions { InsertionMode = InsertionMode.Replace, HttpMethod = "POST", OnBegin = "BeginClient", OnSuccess = "editDatabaseSuccess" , OnFailure="showErrorResponse"}, new { id = "__AjaxAntiForgeryForm" }))
+	{
+		@Html.AntiForgeryToken();
+		@Html.HiddenFor(m => m.SelectedYear);
+		@Html.HiddenFor(m => m.SelectedMonth);
+		@Html.HiddenFor(m => m.ProfileID);
+		if (Model.SlaValues != null)
+		{
+			<div id="userGrid" class="row" style="width:80%">
+
+				<table class="table table-bordered table-condensed">
+					<tr class="label_SLA">
+
+						<th>SLA Item</th>
+						<th>Description</th>
+						<th>Quantity Processed</th>
+						<th>Quantity Outside of SLA</th>
+					</tr>
+					@for (int i = 0; i < Model.SlaValues.Count(); i++)
+					{
+						<tr>
+
+							<td class="Name">
+								@Html.HiddenFor(model => model.SlaValues[i].ID)
+								@Html.HiddenFor(model => model.SlaValues[i].SLAID)
+								@Html.TextBoxFor(model => model.SlaValues[i].SlaName, new { value = @Model.SlaValues[i].SlaName,title= @Model.SlaValues[i].SlaName, @readonly = true, @class = "label_name" })
+							</td>
+							<td class="Description">@Html.TextBoxFor(model => model.SlaValues[i].SlaDescription, new { value = @Model.SlaValues[i].SlaDescription,title= @Model.SlaValues[i].SlaDescription, @readonly = true, @class = "label_description" })</td>
+							<td class="quantity">@Html.TextBoxFor(model => model.SlaValues[i].QuantityProcessed, new { value = @Model.SlaValues[i].QuantityProcessed, @class = "form-control" })</td>
+							<td class="quantity">@Html.TextBoxFor(model => model.SlaValues[i].QuantityOutsideofSLA, new { value = @Model.SlaValues[i].QuantityOutsideofSLA, @class = "form-control" })</td>
+						</tr>
+					}
+				</table>
+				<input type="submit" class="btn btn-success btn-lg" id="btnSave" value="Save" />
+
+
+			</div>
+		}
+
+	}
+</div>
+
+<script>
+	function BeginClient(xhr) {
+
+		securityToken = $('[name=__RequestVerificationToken]').val();
+		xhr.setRequestHeader('__RequestVerificationToken', securityToken);
+	}
+	$.ajaxSetup({
+		'beforeSend': function (xhr) {
+			securityToken = $('[name=__RequestVerificationToken]').val();
+			xhr.setRequestHeader("__RequestVerificationToken", securityToken);
+		}
+	});
+
+</script>

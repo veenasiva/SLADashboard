@@ -1,0 +1,506 @@
+﻿
+.sign-in {
+    color: white;
+    text-decoration: none;
+    background-color: transparent;
+}
+
+/* Set padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Override the default bootstrap behavior where horizontal description lists 
+   will truncate terms that are too long to fit in the left column 
+*/
+.dl-horizontal dt {
+    white-space: normal;
+}
+
+/* Set width on the form input elements since they're 100% wide by default */
+input,
+select,
+textarea {
+    max-width: 280px;
+}
+
+
+.decipha-logo-image-anchor {
+    height: 100px;
+    width: 321px;
+    background: url("./Images/Decipha_Logo_Transparent.png") no-repeat;
+    background-size: contain;
+}
+
+.bg-dxc {
+    background-color: RGB(51,51,51);
+}
+
+
+.flex-column {
+    flex-direction: column;
+}
+
+.display-flex {
+    display: flex;
+}
+
+.ph4, .pr4 {
+    padding-right: 16px;
+}
+
+.ph4, .pl4 {
+    padding-left: 50px;
+}
+
+
+.add-clients {
+    display: inline-block;
+    margin: 0 8px 12px 0;
+}
+
+
+artdeco-pill, artdeco-toggle-pill {
+    height: 32px;
+    color: rgba(0,0,0,.6);
+    border: 0;
+}
+
+artdeco-pill .artdeco-pill-icons, artdeco-toggle-pill .artdeco-pill-icons {
+    position: relative;
+    margin-left: 0;
+    height: 16px;
+    width: 16px;
+}
+
+li-icon[type$="-icon"][size=small] {
+    width: 16px;
+    height: 16px;
+}
+
+li-icon[type$="-icon"] {
+    width: 24px;
+    height: 24px;
+}
+
+
+li-icon {
+    display: inline-block;
+    width: 300px;
+    height: 150px;
+    overflow: hidden;
+    position: relative;
+}
+
+li-icon[type$="-icon"] > svg {
+    vertical-align: top;
+}
+
+li-icon > svg {
+    display: block;
+    margin: auto;
+}
+
+artdeco-pill[type=toggle] button, artdeco-toggle-pill-site button {
+    padding-top: 6px;
+    border: thick;
+}
+
+artdeco-pill[type=toggle] button, artdeco-toggle-pill-site-sel button {
+    padding-top: 6px;
+    border: thick;
+}
+
+artdeco-pill[type=toggle] button, artdeco-pill[type=toggle] label, artdeco-toggle-pill-site button, artdeco-toggle-pill-site label {
+    line-height: 15px;
+    font-weight: 300;
+    display: inline-flex;
+    align-items: center;
+    padding: 12px 12px 12px 10px;
+    margin-top: 5px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    margin-left: 5px;
+    box-shadow: inset 0 0 0 1px #0073b1;
+    background-color: transparent;
+    color: #5cb85c;
+    border-radius: 32px;
+    box-sizing: border-box;
+    min-width: 100px;
+    transition: color ease-in-out 600ms,box-shadow ease-in-out 600ms,background-color ease-in-out 600ms;
+}
+
+artdeco-pill[type=toggle] button, artdeco-pill[type=toggle] label, artdeco-toggle-pill-site-sel button, artdeco-toggle-pill-site-sel label {
+    line-height: 15px;
+    font-weight: 300;
+    display: inline-flex;
+    align-items: center;
+    padding: 12px 12px 12px 10px;
+    margin-top: 5px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    margin-left: 5px;
+    box-shadow: inset 0 0 0 1px #0073b1;
+    background-color: transparent;
+    color: #5bc0de;
+    border-radius: 32px;
+    box-sizing: border-box;
+    min-width: 100px;
+    transition: color ease-in-out 600ms,box-shadow ease-in-out 600ms,background-color ease-in-out 600ms;
+}
+
+
+
+artdeco-pill[type=toggle] button, artdeco-toggle-pill button {
+    padding-top: 6px;
+    border: thick;
+}
+
+artdeco-pill[type=toggle] button, artdeco-pill[type=toggle] label, artdeco-toggle-pill button, artdeco-toggle-pill label {
+    line-height: 40px;
+    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    padding: 12px 12px 12px 10px;
+    margin-top: 5px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    margin-left: 5px;
+    box-shadow: inset 0 0 0 1px #0073b1;
+    background-color: transparent;
+    color: #0073b1;
+    border-radius: 32px;
+    box-sizing: border-box;
+    min-width: 100px;
+    transition: color ease-in-out 600ms,box-shadow ease-in-out 600ms,background-color ease-in-out 600ms;
+}
+
+.small-text, button, input {
+    font-size: 1.45rem;
+    line-height: 1.375;
+}
+
+artdeco-pill[type=toggle] button span, artdeco-pill[type=toggle] label span, artdeco-toggle-pill button span, artdeco-toggle-pill label span {
+    margin-left: 5px;
+}
+
+svg[Attributes Style] {
+    width: 24px;
+    height: 24px;
+}
+
+li-icon[size=small] .active-item, li-icon[size=small] .small-icon, li-icon[type^=nav-][active] .active-item, li-icon[type^=nav-][active] .small-icon {
+    visibility: visible;
+}
+
+li-icon .active-item, li-icon .small-icon {
+    fill: currentColor;
+    visibility: hidden;
+}
+
+.artdeco-pill-label-text {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    max-width: 625px;
+}
+artdeco-toggle-pill-site[checked] button {
+    box-shadow: inset 0 0 0 2px transparent;
+    color: #fff;
+    background-color: #5cb85c;
+}
+
+artdeco-toggle-pill-site-sel[checked] button {
+    box-shadow: inset 0 0 0 2px transparent;
+    color: #fff;
+    background-color: #5bc0de;
+}
+
+    artdeco-toggle-pill-site[checked] button:hover { /* button hover*/
+        color: #5cb85c;
+        background-color: white; /*#fff;*/
+        border-width: 2px;
+        border: solid;
+        min-width: 100px;
+    }
+
+artdeco-toggle-pill-site-sel[checked] button:hover { /* button hover*/
+    color: #5bc0de;
+    background-color: white; /*#fff;*/
+    border-width: 2px;
+    border: solid;
+    min-width: 100px;
+}
+
+
+artdeco-pill[type=toggle][checked] button,
+artdeco-pill[type=toggle][checked] label,
+artdeco-toggle-pill[checked] button,
+artdeco-toggle-pill[checked] label {
+    box-shadow: inset 0 0 0 2px transparent;
+    color: #fff;
+    background-color: #0073b1;
+}
+
+    artdeco-toggle-pill[checked] button:hover { /* button hover*/
+        color: #0073b1;
+        background-color: white; /*#fff;*/
+        border-width: 2px;
+        border: solid;
+        min-width: 100px;
+    }
+
+.border-content {
+    border: 1px solid #ccc;
+    float: left;
+    padding: 1em 1.5em 1em 1.5em;
+}
+
+
+.no-padding{
+    padding-left:0;
+    padding-right:0;
+}
+
+dropup,
+.dropdown {
+    position: relative;
+}
+
+.dropdown-toggle::after {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    margin-left: 0.255em;
+    vertical-align: 0.255em;
+    content: "";
+    border-top: 0.3em solid;
+    border-right: 0.3em solid transparent;
+    border-bottom: 0;
+    border-left: 0.3em solid transparent;
+}
+
+.dropdown-toggle:empty::after {
+    margin-left: 0;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 1000;
+    display: none;
+    float: left;
+    min-width: 10rem;
+    padding: 0.5rem 0;
+    margin: 0.125rem 0 0;
+    font-size: 1rem;
+    color: #212529;
+    text-align: left;
+    list-style: none;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 0.25rem;
+}
+
+.dropup .dropdown-menu {
+    margin-top: 0;
+    margin-bottom: 0.125rem;
+}
+
+.dropup .dropdown-toggle::after {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    margin-left: 0.255em;
+    vertical-align: 0.255em;
+    content: "";
+    border-top: 0;
+    border-right: 0.3em solid transparent;
+    border-bottom: 0.3em solid;
+    border-left: 0.3em solid transparent;
+}
+
+.dropup .dropdown-toggle:empty::after {
+    margin-left: 0;
+}
+
+.dropright .dropdown-menu {
+    margin-top: 0;
+    margin-left: 0.125rem;
+}
+
+.dropright .dropdown-toggle::after {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    margin-left: 0.255em;
+    vertical-align: 0.255em;
+    content: "";
+    border-top: 0.3em solid transparent;
+    border-bottom: 0.3em solid transparent;
+    border-left: 0.3em solid;
+}
+
+.dropright .dropdown-toggle:empty::after {
+    margin-left: 0;
+}
+
+.dropright .dropdown-toggle::after {
+    vertical-align: 0;
+}
+
+.dropleft .dropdown-menu {
+    margin-top: 0;
+    margin-right: 0.125rem;
+}
+
+.dropleft .dropdown-toggle::after {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    margin-left: 0.255em;
+    vertical-align: 0.255em;
+    content: "";
+}
+
+.dropleft .dropdown-toggle::after {
+    display: none;
+}
+
+.dropleft .dropdown-toggle::before {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    margin-right: 0.255em;
+    vertical-align: 0.255em;
+    content: "";
+    border-top: 0.3em solid transparent;
+    border-right: 0.3em solid;
+    border-bottom: 0.3em solid transparent;
+}
+
+.dropleft .dropdown-toggle:empty::after {
+    margin-left: 0;
+}
+
+.dropleft .dropdown-toggle::before {
+    vertical-align: 0;
+}
+
+.dropdown-divider {
+    height: 0;
+    margin: 0.5rem 0;
+    overflow: hidden;
+    border-top: 1px solid #e9ecef;
+}
+
+.dropdown-item {
+    display: block;
+    width: 100%;
+    padding: 0.25rem 1.5rem;
+    clear: both;
+    font-weight: 400;
+    color: #212529;
+    text-align: inherit;
+    white-space: nowrap;
+    background-color: transparent;
+    border: 0;
+}
+
+    .dropdown-item:hover, .dropdown-item:focus {
+        color: #16181b;
+        text-decoration: none;
+        background-color: #f8f9fa;
+    }
+
+    .dropdown-item.active, .dropdown-item:active {
+        color: #fff;
+        text-decoration: none;
+        background-color: #007bff;
+    }
+
+    .dropdown-item.disabled, .dropdown-item:disabled {
+        color: #6c757d;
+        background-color: transparent;
+    }
+
+.dropdown-menu.show {
+    display: block;
+}
+
+.dropdown-header {
+    display: block;
+    padding: 0.5rem 1.5rem;
+    margin-bottom: 0;
+    font-size: 0.875rem;
+    color: #6c757d;
+    white-space: nowrap;
+}
+
+.client-image {
+    height: 70px;
+    width: 70px;
+    border-radius: 50%
+}
+
+
+.btn-glyphicon {
+    padding: 8px;
+    background: #ffffff;
+    margin-right: 4px;
+}
+
+.icon-btn {
+    padding: 1px 15px 3px 2px;
+    border-radius: 50px;
+}
+
+div.profile-image img {
+    height: 100px;
+    width: 80px;
+}
+
+.profile-listing {
+    margin-left: 4px;
+    margin-top: 15px;
+}
+
+.add-profile {
+    margin-top: 50px;
+    margin-left: -50px;
+}
+
+
+.btn-success:hover {
+    background-color: white;
+    color: green;
+    transition-duration: 334ms;
+}
+
+
+.btn-danger:hover {
+    background-color: white;
+    color: darkred;
+    transition-duration: 334ms;
+}
+
+.btn-info:hover {
+    background-color: white;
+    color: #28a4c9;
+    transition-duration: 334ms;
+}
+
+.btn-warning:hover {
+    background-color: white;
+    color: #e38d13;
+    transition-duration: 334ms;
+}
+
+.btn-primary:hover {
+    background-color: white;
+    color: #337ab7;
+    transition-duration: 334ms;
+}
